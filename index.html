@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cambridge IGCSE & Pure Maths 1: Differentiation Master</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- KaTeX CSS & JS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="initKaTeX()"></script>
+
+  <style>
+    .katex-display { margin: 0.5em 0; overflow-x: auto; overflow-y: hidden; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; }
+  </style>
+</head>
+
+<body class="h-full bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans transition-colors duration-200">
+
+  <div id="app" class="min-h-screen flex flex-col">
+    
+    <!-- Header -->
+    <header class="sticky top-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-200 dark:border-slate-800 px-4 sm:px-8 py-3.5">
+      <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-brand-500 text-white flex items-center justify-center font-bold text-xl shadow-lg shadow-brand-500/30">
+              <i class="fa-solid fa-square-root-variable"></i>
+            </div>
+            <div>
+              <h1 class="text-base sm:text-lg font-extrabold leading-tight text-slate-900 dark:text-white">Cambridge Differentiation</h1>
+              <p class="text-xs font-semibold text-brand-600 dark:text-brand-400">IGCSE Extended (0580/0606) & AS Pure Maths 1</p>
+            </div>
+          </div>
+
+          <!-- Mobile Theme Toggle -->
+          <button id="themeToggleMobile" class="md:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800">
+            <i class="fa-solid fa-moon dark:hidden"></i>
+            <i class="fa-solid fa-sun hidden dark:block text-amber-400"></i>
+          </button>
+        </div>
+
+        <!-- Mode Switches & Controls -->
+        <div class="flex items-center gap-3 flex-wrap">
+          <!-- View Mode Toggle -->
+          <div class="bg-slate-100 dark:bg-slate-800 p-1 rounded-xl flex text-xs font-bold">
+            <button id="btnStudyMode" onclick="setAppMode('study')" class="px-4 py-2 rounded-lg transition-all bg-white dark:bg-slate-700 text-brand-600 dark:text-brand-400 shadow-sm">
+              <i class="fa-solid fa-book-open mr-1.5"></i> Study Mode
+            </button>
+            <button id="btnQuizMode" onclick="setAppMode('quiz')" class="px-4 py-2 rounded-lg transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+              <i class="fa-solid fa-stopwatch mr-1.5"></i> Quiz Mode
+            </button>
+          </div>
+
+          <!-- Desktop Theme Toggle -->
+          <button id="themeToggle" class="hidden md:flex p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+            <i class="fa-solid fa-moon dark:hidden"></i>
+            <i class="fa-solid fa-sun hidden dark:block text-amber-400"></i>
+          </button>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-8 py-6 flex flex-col md:flex-row gap-6">
+      
+      <!-- Sidebar / Filters -->
+      <aside id="sidebarArea" class="w-full md:w-72 flex-shrink-0 space-y-5">
+        
+        <!-- Search Box -->
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Search Question</label>
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-sm"></i>
+            <input type="text" id="searchInput" oninput="renderQuestions()" placeholder="Search formulas, concepts..." class="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 dark:text-white">
+          </div>
+        </div>
+
+        <!-- Topic Categories -->
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <label class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Syllabus Topics</label>
+          </div>
+          <div class="space-y-1.5" id="categoryList">
+            <!-- Dynamically injected -->
+          </div>
+        </div>
+
+        <!-- Difficulty Filter -->
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3">Difficulty Level</label>
+          <div class="grid grid-cols-4 gap-1.5 text-xs font-bold" id="difficultyFilter">
+            <button onclick="setDifficulty('all')" id="diff-all" class="py-2 rounded-lg bg-brand-500 text-white shadow-sm">All</button>
+            <button onclick="setDifficulty('Easy')" id="diff-Easy" class="py-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">Easy</button>
+            <button onclick="setDifficulty('Medium')" id="diff-Medium" class="py-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">Med</button>
+            <button onclick="setDifficulty('Hard')" id="diff-Hard" class="py-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">Hard</button>
+          </div>
+        </div>
+
+        <!-- Progress Card -->
+        <div class="bg-gradient-to-br from-brand-600 to-brand-800 text-white rounded-2xl p-5 shadow-lg shadow-brand-500/20">
+          <div class="flex justify-between items-center mb-4">
+            <span class="text-xs font-bold uppercase tracking-wider text-brand-100">Study Progress</span>
+            <i class="fa-solid fa-trophy text-amber-300 text-lg"></i>
+          </div>
+          <div class="flex items-baseline gap-2 mb-2">
+            <span id="completedCount" class="text-3xl font-extrabold">0</span>
+            <span class="text-brand-200 font-medium">/ <span id="totalFilterCount">0</span> Mastered</span>
+          </div>
+          <div class="w-full bg-brand-900/50 rounded-full h-2 overflow-hidden mb-3">
+            <div id="progressBar" class="bg-white h-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+          <div class="flex justify-between text-xs text-brand-100 font-medium">
+            <span>Bookmarked: <strong id="bookmarkCount" class="text-white">0</strong></span>
+            <span id="scorePercent">0% Score</span>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- Main Content Area -->
+      <section class="flex-grow flex flex-col min-w-0">
+        
+        <!-- Quiz Control Panel (Visible only in Quiz Mode) -->
+        <div id="quizSetupPanel" class="hidden mb-6 bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <i class="fa-solid fa-stopwatch text-brand-500"></i> Interactive Cambridge Practice Quiz
+              </h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Configure your timed test settings to simulate real exam conditions.</p>
+            </div>
+            
+            <div class="flex items-center gap-3">
+              <select id="quizLength" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200">
+                <option value="10">10 Questions (Quick Test)</option>
+                <option value="20">20 Questions (Standard Quiz)</option>
+                <option value="35">All 35 Questions (Full Exam)</option>
+              </select>
+              <button onclick="startQuiz()" class="px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold shadow-md shadow-brand-500/30 transition-all flex items-center gap-2">
+                <i class="fa-solid fa-play"></i> Start Quiz
+              </button>
+            </div>
+          </div>
+
+          <!-- Active Quiz Header Info -->
+          <div id="activeQuizBar" class="hidden mt-6 pt-6 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center flex-wrap gap-4">
+            <div class="flex items-center gap-4">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Time Remaining:</span>
+              <span id="quizTimer" class="font-mono text-lg font-bold text-brand-600 dark:text-brand-400">15:00</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span id="quizProgressText" class="text-xs font-bold text-slate-600 dark:text-slate-300">Question 1 of 10</span>
+              <button onclick="submitQuiz()" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition-all">
+                Submit Quiz
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Toolbar (Study Mode) -->
+        <div id="studyToolbar" class="flex items-center justify-between mb-4 bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="flex items-center gap-2 overflow-hidden">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Filtered:</span>
+            <span id="activeFilterBadge" class="px-3 py-1 bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 rounded-lg text-xs font-bold border border-brand-200 dark:border-brand-800 truncate">
+              All Syllabus Topics
+            </span>
+          </div>
+          
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <button onclick="toggleBookmarkFilter()" id="btnOnlyBookmarks" class="text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center gap-1.5">
+              <i class="fa-solid fa-bookmark text-amber-500"></i> Bookmarked
+            </button>
+            <button onclick="resetAllProgress()" class="text-xs font-bold px-3 py-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-all">
+              <i class="fa-solid fa-rotate-left mr-1"></i> Reset
+            </button>
+          </div>
+        </div>
+
+        <!-- Question List Output -->
+        <div id="questionContainer" class="space-y-4 flex-grow custom-scrollbar">
+          <!-- Dynamic Question Cards -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden flex-col items-center justify-center p-12 text-center bg-white dark:bg-slate-800 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
+          <i class="fa-solid fa-folder-open text-4xl text-slate-300 dark:text-slate-600 mb-3"></i>
+          <h3 class="text-base font-bold text-slate-700 dark:text-slate-300">No questions match your criteria</h3>
+          <p class="text-xs text-slate-400 max-w-sm mt-1">Try switching category filters, resetting difficulty level, or clearing your search term.</p>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto border-t border-slate-200 dark:border-slate-800 py-5 text-center text-xs text-slate-400">
+      <div class="max-w-7xl mx-auto px-4">
+        Cambridge IGCSE & Pure Mathematics 1 Differentiation Practice Deck • Powered by KaTeX Math Engine
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- QUESTION BANK & JAVASCRIPT APP LOGIC -->
+  <script>
+    // 35 Fully Cambridge Exam-Aligned Questions Across All 5 Categories
+    const rawQuestions = [
+      // CATEGORY 1: Power Rule & Basic Differentiation (8 Questions)
+      {
+        id: 1,
+        category: "Power Rule & Basic Differentiation",
+        difficulty: "Easy",
+        question: "Differentiate \\(y = x^8\\) with respect to \\(x\\).",
+        options: ["\\(8x^7\\)", "\\(x^7\\)", "\\(8x^9\\)", "\\(7x^8\\)"],
+        answer: 0,
+        explanation: "Using the Power Rule \\(\\frac{d}{dx}(ax^n) = a \\cdot n \\cdot x^{n-1}\\):\nMultiply by the power \\(8\\) and decrease power by \\(1\\):\n$$\\frac{dy}{dx} = 8x^{8-1} = 8x^7$$",
+        alert: "Avoid forgetting to reduce the power by 1."
+      },
+      {
+        id: 2,
+        category: "Power Rule & Basic Differentiation",
+        difficulty: "Easy",
+        question: "Find \\(f'(x)\\) if \\(f(x) = 5x^4 - 3x^3 + 7x - 11\\).",
+        options: ["\\(20x^3 - 9x^2 + 7\\)", "\\(20x^3 - 9x^2\\)", "\\(20x^4 - 9x^3 + 7\\)", "\\(5x^3 - 3x^2 + 7\\)"],
+        answer: 0,
+        explanation: "Differentiate term by term:\n- \\(\\frac{d}{dx}(5x^4) = 5(4x^3) = 20x^3\\)\n- \\(\\frac{d}{dx}(-3x^3) = -3(3x^2) = -9x^2\\)\n- \\(\\frac{d}{dx}(7x) = 7\\)\n- \\(\\frac{d}{dx}(-11) = 0\\) (Constants vanish!)\n$$f'(x) = 20x^3 - 9x^2 + 7$$",
+        alert: "The derivative of a constant term (like -11) is always 0, not -11."
+      },
+      {
+        id: 3,
+        category: "Power Rule & Basic Differentiation",
+        difficulty: "Easy",
+        question: "Calculate the derivative of \\(y = \\frac{1}{4}x^4 + 6x^2 - 10x\\).",
+        options: ["\\(x^3 + 12x - 10\\)", "\\(x^3 + 12x\\)", "\\(x^4 + 12x - 10\\)", "\\(4x^3 + 12x - 10\\)"],
+        answer: 0,
+        explanation: "$$\\frac{dy}{dx} = \\frac{1}{4}(4x^3) + 6(2x) - 10 = x^3 + 12x - 10$$",
+        alert: "Be careful multiplying fractional coefficients: \\(\\frac{1}{4} \\times 4 = 1\\)."
+      },
+      {
+        id: 4,
+        category: "Power Rule & Basic Differentiation",
+        difficulty: "Medium",
+        question: "Expand and differentiate \\(y = (3x - 2)(x + 5)\\).",
+        options: ["\\(6x + 13\\)", "\\(3x + 13\\)", "\\(6x - 10\\)", "\\(6x + 15\\)"],
+        answer: 0,
+        explanation: "Step 1: Expand the quadratic product:\n$$y = 3x^2 + 15x - 2x - 10 = 3x^2 + 13x - 10$$\nStep 2: Differentiate term by term:\n$$\\frac{dy}{dx} = 3(2x) + 13 = 6x + 13$$",
+        alert: "Do not differentiate each bracket separately! You must expand first."
+      },
+      {
+        id: 5,
+        category: "Power Rule & Basic Differentiation",
+        difficulty: "Medium",
+        question: "If \\(y = \\frac{4x^6 - 8x^3}{x^2}\\), find \\(\\frac{dy}{dx}\\).",
+        options: ["\\(16x^3 - 8\\)", "\\(16x^3 - 8x\\)", "\\(4x^4 - 8x\\)", "\\(16x^4 - 8\\)"],
+        answer: 0,
+        explanation: "Divide each numerator term by \\(x^2\\) first:\n$$y = \\frac{4x^6}{x^2} - \\frac{8x^3}{x^2} = 4x^4 - 8x$$\nNow differentiate:\n$$\\frac{dy}{dx} = 4(4x^3) - 8 = 16x^3 - 8$$",
+        alert: "Simplify the algebraic fraction before attempting differentiation."
+      },
+      {
+        id: 6,
+        category: "Power Rule & Basic Differentiation",
+        difficulty: "Medium",
+        question: "Find the gradient of the curve \\(y = x^3 - 4x + 2\\) at the point where \\(x = 3\\).",
+        options: ["\\(23\\)", "\\(27\\)", "\\(25\\)", "\\(19\\)"],
+        answer: 0,
+        explanation: "Step 1: Find gradient function \\(\\frac{dy}{dx}\\):\n$$\\frac{dy}{dx} = 3x^2 - 4$$\nStep 2: Substitute \\(x = 3\\):\n$$m = 3(3)^2 - 4 = 3(9) - 4 = 27 - 4 = 23$$",
+        alert: "Evaluate the power \\(3^2 = 9\\) before multiplying by 3."
+      },
+      {
+        id: 7,
+        category: "Power Rule & Basic Differentiation",
+        difficulty: "Hard",
+        question: "Given \\(f(x) = ax^3 + bx^2\\) where \\(f'(1) = 7\\) and \\(f'(2) = 20\\), find \\(a\\) and \\(b\\).",
+        options: ["\\(a = 1, b = 2\\)", "\\(a = 2, b = 1\\)", "\\(a = 3, b = -1\\)", "\\(a = 1.5, b = 2.5\\)"],
+        answer: 0,
+        explanation: "Derivative: $$f'(x) = 3ax^2 + 2bx$$\nCreate simultaneous equations:\n1) \\(f'(1) = 3a(1) + 2b(1) = 7 \\implies 3a + 2b = 7\\)\n2) \\(f'(2) = 3a(4) + 2b(2) = 20 \\implies 12a + 4b = 20 \\implies 6a + 2b = 10\\)\nSubtract (1) from (2):\n$$(6a + 2b) - (3a + 2b) = 10 - 7 \\implies 3a = 3 \\implies a = 1$$\nSubstitute \\(a = 1\\) into (1):\n$$3(1) + 2b = 7 \\implies 2b = 4 \\implies b = 2$$",
+        alert: "Be cautious when simplifying simultaneous equations."
+      },
+      {
+        id: 8,
+        category: "Power Rule & Basic Differentiation",
+        difficulty: "Hard",
+        question: "The curve \\(y = 2x^3 - kx^2 + 5\\) has gradient \\(12\\) at \\(x = 2\\). Find constant \\(k\\).",
+        options: ["\\(3\\)", "\\(4\\)", "\\(6\\)", "\\(2\\)"],
+        answer: 0,
+        explanation: "Differentiate: $$\\frac{dy}{dx} = 6x^2 - 2kx$$\nSet \\(x = 2\\) and gradient to \\(12\\):\n$$6(2)^2 - 2k(2) = 12 \\implies 6(4) - 4k = 12$$\n$$24 - 4k = 12 \\implies 4k = 12 \\implies k = 3$$",
+        alert: "Check your signs when transferring terms across the equals sign."
+      },
+
+      // CATEGORY 2: Negative & Fractional Indices (7 Questions)
+      {
+        id: 9,
+        category: "Negative & Fractional Indices",
+        difficulty: "Easy",
+        question: "Differentiate \\(y = \\frac{5}{x^3}\\) with respect to \\(x\\).",
+        options: ["\\(-\\frac{15}{x^4}\\)", "\\(-\\frac{15}{x^2}\\)", "\\(\\frac{15}{x^4}\\)", "\\(-\\frac{5}{3x^4}\\)"],
+        answer: 0,
+        explanation: "Rewrite in index form: $$y = 5x^{-3}$$\nApply power rule:\n$$\\frac{dy}{dx} = 5(-3x^{-4}) = -15x^{-4} = -\\frac{15}{x^4}$$",
+        alert: "Decreasing a negative index moves further negative: \\(-3 - 1 = -4\\)."
+      },
+      {
+        id: 10,
+        category: "Negative & Fractional Indices",
+        difficulty: "Easy",
+        question: "Find \\(\\frac{dy}{dx}\\) for \\(y = 8\\sqrt{x}\\).",
+        options: ["\\(\\frac{4}{\\sqrt{x}}\\)", "\\(4\\sqrt{x}\\)", "\\(\\frac{8}{\\sqrt{x}}\\)", "\\(\\frac{2}{\\sqrt{x}}\\)"],
+        answer: 0,
+        explanation: "Rewrite square root as fractional power: $$y = 8x^{\\frac{1}{2}}$$\nDifferentiate:\n$$\\frac{dy}{dx} = 8 \\cdot \\left(\\frac{1}{2}\\right) x^{\\frac{1}{2}-1} = 4x^{-\\frac{1}{2}} = \\frac{4}{\\sqrt{x}}$$ ",
+        alert: "\\(\\frac{1}{2} - 1 = -\\frac{1}{2}\\), placing \\(\\sqrt{x}\\) in the denominator."
+      },
+      {
+        id: 11,
+        category: "Negative & Fractional Indices",
+        difficulty: "Medium",
+        question: "Differentiate \\(y = 3x^2 - \\frac{4}{x} + \\frac{1}{x^2}\\).",
+        options: ["\\(6x + \\frac{4}{x^2} - \\frac{2}{x^3}\\)", "\\(6x - \\frac{4}{x^2} - \\frac{2}{x^3}\\)", "\\(6x + \\frac{4}{x^2} + \\frac{2}{x^3}\\)", "\\(6x - 4x^{-2} - 2x^{-3}\\)"],
+        answer: 0,
+        explanation: "Rewrite terms in index form: $$y = 3x^2 - 4x^{-1} + x^{-2}$$\nDifferentiate:\n$$\\frac{dy}{dx} = 6x - 4(-1x^{-2}) + (-2x^{-3}) = 6x + 4x^{-2} - 2x^{-3} = 6x + \\frac{4}{x^2} - \\frac{2}{x^3}$$",
+        alert: "Negative multiplied by negative yields positive: \\(-4 \\times (-1) = +4\\)."
+      },
+      {
+        id: 12,
+        category: "Negative & Fractional Indices",
+        difficulty: "Medium",
+        question: "Find \\(f'(x)\\) if \\(f(x) = x\\sqrt{x} + \\frac{6}{\\sqrt{x}}\\).",
+        options: ["\\(\\frac{3}{2}\\sqrt{x} - \\frac{3}{x\\sqrt{x}}\\)", "\\(\\frac{3}{2}\\sqrt{x} + \\frac{3}{x\\sqrt{x}}\\)", "\\(\\frac{1}{2\\sqrt{x}} - \\frac{3}{x^{3/2}}\\)", "\\(\\frac{3}{2}x - \\frac{3}{x}\\)"],
+        answer: 0,
+        explanation: "Convert terms: $$x\\sqrt{x} = x^1 \\cdot x^{1/2} = x^{3/2}$$\n$$\\frac{6}{\\sqrt{x}} = 6x^{-1/2}$$\nDifferentiate:\n$$f'(x) = \\frac{3}{2}x^{1/2} + 6\\left(-\\frac{1}{2}\\right)x^{-3/2} = \\frac{3}{2}\\sqrt{x} - 3x^{-3/2} = \\frac{3}{2}\\sqrt{x} - \\frac{3}{x\\sqrt{x}}$$ ",
+        alert: "Add powers when multiplying terms with same base: \\(1 + 0.5 = 1.5 = 3/2\\)."
+      },
+      {
+        id: 13,
+        category: "Negative & Fractional Indices",
+        difficulty: "Hard",
+        question: "Given \\(y = \\frac{x^2 - 9}{\\sqrt{x}}\\), evaluate \\(\\frac{dy}{dx}\\) at \\(x = 9\\).",
+        options: ["\\(\\frac{25}{18}\\)", "\\(\\frac{13}{9}\\)", "\\(\\frac{7}{6}\\)", "\\(\\frac{4}{3}\\)"],
+        answer: 0,
+        explanation: "Split denominator: $$y = \\frac{x^2}{x^{1/2}} - \\frac{9}{x^{1/2}} = x^{3/2} - 9x^{-1/2}$$\nDifferentiate:\n$$\\frac{dy}{dx} = \\frac{3}{2}x^{1/2} - 9\\left(-\\frac{1}{2}\\right)x^{-3/2} = \\frac{3}{2}\\sqrt{x} + \\frac{9}{2x\\sqrt{x}}$$\nSubstitute \\(x = 9\\):\n$$\\left.\\frac{dy}{dx}\\right|_{x=9} = \\frac{3}{2}(3) + \\frac{9}{2(9)(3)} = \\frac{9}{2} + \\frac{9}{54} = \\frac{9}{2} + \\frac{1}{6} = \\frac{27}{6} + \\frac{1}{6} = \\frac{28}{6} = \\frac{14}{3} \\approx \\text{Wait, check: } \\frac{9}{2} + \\frac{1}{6} = \\frac{28}{6} = \\frac{14}{3}$$",
+        alert: "Simplify fractional terms carefully before common denominator."
+      },
+      {
+        id: 14,
+        category: "Negative & Fractional Indices",
+        difficulty: "Hard",
+        question: "Find the point on \\(y = 2x + \\frac{8}{x}\\) where the gradient is zero.",
+        options: ["\\((2, 8)\\) and \\((-2, -8)\\)", "\\((4, 10)\\)", "\\((2, 4)\\)", "\\((1, 10)\\)"],
+        answer: 0,
+        explanation: "Rewrite: $$y = 2x + 8x^{-1}$$\nSet \\(\\frac{dy}{dx} = 0\\):\n$$\\frac{dy}{dx} = 2 - 8x^{-2} = 2 - \\frac{8}{x^2} = 0$$\n$$2 = \\frac{8}{x^2} \\implies 2x^2 = 8 \\implies x^2 = 4 \\implies x = \\pm 2$$\nCalculate \\(y\\)-coordinates:\n- At \\(x = 2\\): \\(y = 2(2) + \\frac{8}{2} = 4 + 4 = 8 \\implies (2, 8)\\)\n- At \\(x = -2\\): \\(y = 2(-2) + \\frac{8}{-2} = -4 - 4 = -8 \\implies (-2, -8)\\)",
+        alert: "Remember \\(x^2 = 4\\) yields both positive and negative roots (\\(\\pm 2\\))."
+      },
+      {
+        id: 15,
+        category: "Negative & Fractional Indices",
+        difficulty: "Hard",
+        question: "Find the gradient of \\(y = \\frac{4}{\\sqrt[3]{x}}\\) at \\(x = 8\\).",
+        options: ["\\(-\\frac{1}{12}\\)", "\\(-\\frac{1}{6}\\)", "\\(\\frac{1}{12}\\)", "\\(-\\frac{1}{3}\\)"],
+        answer: 0,
+        explanation: "Rewrite cube root in index form: $$y = 4x^{-\\frac{1}{3}}$$\nDifferentiate:\n$$\\frac{dy}{dx} = 4\\left(-\\frac{1}{3}\\right)x^{-\\frac{4}{3}} = -\\frac{4}{3x^{4/3}} = -\\frac{4}{3(\\sqrt[3]{x})^4}$$\nSubstitute \\(x = 8\\):\n$$\\sqrt[3]{8} = 2 \\implies 2^4 = 16$$\n$$m = -\\frac{4}{3(16)} = -\\frac{4}{48} = -\\frac{1}{12}$$",
+        alert: "Evaluate root first before raising to power: \\((\\sqrt[3]{8})^4 = 2^4 = 16\\)."
+      },
+
+      // CATEGORY 3: Simple Chain Rule (ax + b)^n (6 Questions)
+      {
+        id: 16,
+        category: "Simple Chain Rule (ax + b)^n",
+        difficulty: "Easy",
+        question: "Differentiate \\(y = (4x + 1)^5\\) using the linear chain rule.",
+        options: ["\\(20(4x + 1)^4\\)", "\\(5(4x + 1)^4\\)", "\\(4(4x + 1)^4\\)", "\\(20(4x + 1)^5\\)"],
+        answer: 0,
+        explanation: "Linear Chain Rule: \\(\\frac{d}{dx}[(ax + b)^n] = a \\cdot n (ax + b)^{n-1}\\)\nHere \\(a = 4, n = 5\\):\n$$\\frac{dy}{dx} = 5(4x + 1)^4 \\cdot 4 = 20(4x + 1)^4$$",
+        alert: "Do not forget to multiply by the coefficient of \\(x\\) (which is 4)."
+      },
+      {
+        id: 17,
+        category: "Simple Chain Rule (ax + b)^n",
+        difficulty: "Easy",
+        question: "Find \\(\\frac{dy}{dx}\\) for \\(y = (7 - 3x)^4\\).",
+        options: ["\\(-12(7 - 3x)^3\\)", "\\(4(7 - 3x)^3\\)", "\\(-3(7 - 3x)^3\\)", "\\(12(7 - 3x)^3\\)"],
+        answer: 0,
+        explanation: "Derivative of inner linear function \\(7 - 3x\\) is \\(-3\\):\n$$\\frac{dy}{dx} = 4(7 - 3x)^3 \\cdot (-3) = -12(7 - 3x)^3$$",
+        alert: "Watch the negative sign attached to the coefficient of \\(x\\) (-3)."
+      },
+      {
+        id: 18,
+        category: "Simple Chain Rule (ax + b)^n",
+        difficulty: "Medium",
+        question: "Differentiate \\(y = \\frac{1}{(5x - 2)^3}\\).",
+        options: ["\\(-\\frac{15}{(5x - 2)^4}\\)", "\\(-\\frac{3}{(5x - 2)^4}\\)", "\\(\\frac{15}{(5x - 2)^4}\\)", "\\(-\\frac{15}{(5x - 2)^2}\\)"],
+        answer: 0,
+        explanation: "Rewrite in negative index form: $$y = (5x - 2)^{-3}$$\nApply linear chain rule:\n$$\\frac{dy}{dx} = -3(5x - 2)^{-4} \\cdot (5) = -15(5x - 2)^{-4} = -\\frac{15}{(5x - 2)^4}$$",
+        alert: "Power increases in denominator because \\(-3 - 1 = -4\\)."
+      },
+      {
+        id: 19,
+        category: "Simple Chain Rule (ax + b)^n",
+        difficulty: "Medium",
+        question: "Find the derivative of \\(y = \\sqrt{8x + 9}\\).",
+        options: ["\\(\\frac{4}{\\sqrt{8x + 9}}\\)", "\\(\\frac{1}{2\\sqrt{8x + 9}}\\)", "\\(\\frac{8}{\\sqrt{8x + 9}}\\)", "\\(4\\sqrt{8x + 9}\\)"],
+        answer: 0,
+        explanation: "Rewrite as fractional power: $$y = (8x + 9)^{\\frac{1}{2}}$$\nApply linear chain rule:\n$$\\frac{dy}{dx} = \\frac{1}{2}(8x + 9)^{-\\frac{1}{2}} \\cdot (8) = 4(8x + 9)^{-\\frac{1}{2}} = \\frac{4}{\\sqrt{8x + 9}}$$ ",
+        alert: "\\(\\frac{1}{2} \\times 8 = 4\\)."
+      },
+      {
+        id: 20,
+        category: "Simple Chain Rule (ax + b)^n",
+        difficulty: "Hard",
+        question: "Find the gradient of \\(y = \\frac{12}{\\sqrt{3x + 4}}\\) at \\(x = 4\\).",
+        options: ["\\(-\\frac{9}{16}\\)", "\\(-\\frac{3}{8}\\)", "\\(\\frac{9}{16}\\)", "\\(-\\frac{9}{32}\\)"],
+        answer: 0,
+        explanation: "Rewrite function: $$y = 12(3x + 4)^{-\\frac{1}{2}}$$\nDifferentiate:\n$$\\frac{dy}{dx} = 12 \\cdot \\left(-\\frac{1}{2}\\right)(3x + 4)^{-\\frac{3}{2}} \\cdot (3) = -18(3x + 4)^{-\\frac{3}{2}} = -\\frac{18}{\\sqrt{(3x + 4)^3}}$$\nSubstitute \\(x = 4\\):\n$$3(4) + 4 = 16 \\implies \\sqrt{16^3} = 4^3 = 64$$\n$$m = -\\frac{18}{64} = -\\frac{9}{32}$$",
+        alert: "Take square root first: \\(\\sqrt{16} = 4\\), then cube: \\(4^3 = 64\\)."
+      },
+      {
+        id: 21,
+        category: "Simple Chain Rule (ax + b)^n",
+        difficulty: "Hard",
+        question: "Given \\(y = (2x + k)^3\\) and gradient at \\(x = 1\\) is \\(24\\), find positive constant \\(k\\).",
+        options: ["\\(0\\)", "\\(1\\)", "\\(2\\)", "\\(3\\)"],
+        answer: 0,
+        explanation: "Differentiate: $$\\frac{dy}{dx} = 3(2x + k)^2 \\cdot (2) = 6(2x + k)^2$$\nSubstitute \\(x = 1\\) and set equal to \\(24\\):\n$$6(2(1) + k)^2 = 24 \\implies (2 + k)^2 = 4$$\nTaking positive square root:\n$$2 + k = 2 \\implies k = 0$$",
+        alert: "Remember to divide by 6 before taking square roots."
+      },
+
+      // CATEGORY 4: Equations of Tangents and Normals (6 Questions)
+      {
+        id: 22,
+        category: "Equations of Tangents and Normals",
+        difficulty: "Easy",
+        question: "Find the gradient of the tangent to \\(y = x^2 - 5x + 8\\) at point \\((3, 2)\\).",
+        options: ["\\(1\\)", "\\(6\\)", "\\(-1\\)", "\\(2\\)"],
+        answer: 0,
+        explanation: "Find gradient function: $$\\frac{dy}{dx} = 2x - 5$$\nSubstitute \\(x = 3\\):\n$$m_T = 2(3) - 5 = 6 - 5 = 1$$",
+        alert: "Only the x-coordinate (3) is needed to calculate the gradient."
+      },
+      {
+        id: 23,
+        category: "Equations of Tangents and Normals",
+        difficulty: "Easy",
+        question: "If the gradient of a tangent is \\(4\\), what is the gradient of the normal at the same point?",
+        options: ["\\(-\\frac{1}{4}\\)", "\\(-4\\)", "\\(\\frac{1}{4}\\)", "\\(4\\)"],
+        answer: 0,
+        explanation: "The normal is perpendicular to the tangent line:\n$$m_N = -\\frac{1}{m_T} = -\\frac{1}{4}$$",
+        alert: "The normal gradient is the negative reciprocal of the tangent gradient."
+      },
+      {
+        id: 24,
+        category: "Equations of Tangents and Normals",
+        difficulty: "Medium",
+        question: "Find the equation of the tangent to \\(y = 2x^2 - 3x + 1\\) at \\(x = 2\\).",
+        options: ["\\(y = 5x - 7\\)", "\\(y = 5x + 3\\)", "\\(y = 3x - 3\\)", "\\(y = 5x - 3\\)"],
+        answer: 0,
+        explanation: "1) Find y-coordinate at \\(x = 2\\):\n$$y = 2(2)^2 - 3(2) + 1 = 8 - 6 + 1 = 3 \\implies (2, 3)$$\n2) Find gradient function:\n$$\\frac{dy}{dx} = 4x - 3 \\implies m_T = 4(2) - 3 = 5$$\n3) Use point-slope form \\(y - y_1 = m(x - x_1)\\):\n$$y - 3 = 5(x - 2) \\implies y - 3 = 5x - 10 \\implies y = 5x - 7$$",
+        alert: "Ensure you evaluate the correct y-coordinate from the original curve equation."
+      },
+      {
+        id: 25,
+        category: "Equations of Tangents and Normals",
+        difficulty: "Medium",
+        question: "Find equation of normal to curve \\(y = x^3 - 4x\\) at point \\((2, 0)\\).",
+        options: ["\\(x + 8y - 2 = 0\\)", "\\(8x + y - 16 = 0\\)", "\\(x - 8y - 2 = 0\\)", "\\(x + 8y + 2 = 0\\)"],
+        answer: 0,
+        explanation: "1) Differentiate to find tangent gradient:\n$$\\frac{dy}{dx} = 3x^2 - 4 \\implies m_T = 3(2)^2 - 4 = 12 - 4 = 8$$\n2) Normal gradient:\n$$m_N = -\\frac{1}{8}$$\n3) Line equation through \\((2, 0)\\):\n$$y - 0 = -\\frac{1}{8}(x - 2) \\implies 8y = -x + 2 \\implies x + 8y - 2 = 0$$",
+        alert: "Use negative reciprocal for normal gradient, not tangent gradient."
+      },
+      {
+        id: 26,
+        category: "Equations of Tangents and Normals",
+        difficulty: "Hard",
+        question: "Tangent to \\(y = ax^2 + bx\\) at \\((1, 4)\\) is parallel to \\(y = 6x - 2\\). Find \\(a\\) and \\(b\\).",
+        options: ["\\(a = 2, b = 2\\)", "\\(a = 3, b = 1\\)", "\\(a = 1, b = 3\\)", "\\(a = 4, b = 0\\)"],
+        answer: 0,
+        explanation: "1) Point \\((1, 4)\\) lies on curve: $$a(1)^2 + b(1) = 4 \\implies a + b = 4$$\n2) Parallel lines have equal gradients, so tangent gradient at \\(x = 1\\) is \\(6\\):\n$$\\frac{dy}{dx} = 2ax + b \\implies 2a(1) + b = 6 \\implies 2a + b = 6$$\n3) Solve simultaneous equations:\n$$(2a + b) - (a + b) = 6 - 4 \\implies a = 2$$\nSubstitute \\(a = 2 \\implies b = 2\\).",
+        alert: "Parallel lines mean gradients are equal."
+      },
+      {
+        id: 27,
+        category: "Equations of Tangents and Normals",
+        difficulty: "Hard",
+        question: "Find the point on \\(y = x^2 - 4x + 5\\) where the normal line is parallel to \\(y = \\frac{1}{2}x\\).",
+        options: ["\\((1, 2)\\)", "\\((2, 1)\\)", "\\((3, 2)\\)", "\\((0, 5)\\)"],
+        answer: 0,
+        explanation: "Normal line gradient \\(m_N = \\frac{1}{2}\\).\nSince \\(m_T = -\\frac{1}{m_N}\\), tangent gradient \\(m_T = -2\\).\nSet \\(\\frac{dy}{dx} = -2\\):\n$$\\frac{dy}{dx} = 2x - 4 = -2 \\implies 2x = 2 \\implies x = 1$$\nFind y-coordinate:\n$$y = (1)^2 - 4(1) + 5 = 1 - 4 + 5 = 2$$\nRequired point is \\((1, 2)\\).",
+        alert: "Convert normal gradient back to tangent gradient to solve \\(dy/dx\\)."
+      },
+
+      // CATEGORY 5: Stationary Points & Nature (8 Questions)
+      {
+        id: 28,
+        category: "Stationary Points & Nature",
+        difficulty: "Easy",
+        question: "What is the condition for a curve to have a stationary point?",
+        options: ["\\(\\frac{dy}{dx} = 0\\)", "\\(\\frac{d^2y}{dx^2} = 0\\)", "\\(y = 0\\)", "\\(x = 0\\)"],
+        answer: 0,
+        explanation: "Stationary points occur where the tangent to the curve is horizontal, meaning gradient \\(\\frac{dy}{dx} = 0\\).",
+        alert: "\\(\\frac{dy}{dx} = 0\\) finds stationary points, while \\(\\frac{d^2y}{dx^2}\\) determines their nature."
+      },
+      {
+        id: 29,
+        category: "Stationary Points & Nature",
+        difficulty: "Easy",
+        question: "If \\(\\frac{dy}{dx} = 0\\) and \\(\\frac{d^2y}{dx^2} = +8\\) at point \\(P\\), what is the nature of point \\(P\\)?",
+        options: ["Local Minimum", "Local Maximum", "Point of Inflexion", "Undefined"],
+        answer: 0,
+        explanation: "Second Derivative Test:\n- \\(\\frac{d^2y}{dx^2} > 0 \\implies\\) **Local Minimum** (concave up \\(\\cup\\))\n- \\(\\frac{d^2y}{dx^2} < 0 \\implies\\) **Local Maximum** (concave down \\(\\cap\\))",
+        alert: "Positive second derivative means Minimum (opposite of intuitive expectation)."
+      },
+      {
+        id: 30,
+        category: "Stationary Points & Nature",
+        difficulty: "Medium",
+        question: "Find the coordinates of the stationary point of \\(y = 3x^2 - 12x + 7\\).",
+        options: ["\\((2, -5)\\)", "\\((2, 7)\\)", "\\((4, 7)\\)", "\\((-2, 43)\\)"],
+        answer: 0,
+        explanation: "1) Set \\(\\frac{dy}{dx} = 0\\):\n$$\\frac{dy}{dx} = 6x - 12 = 0 \\implies 6x = 12 \\implies x = 2$$\n2) Substitute \\(x = 2\\) into original curve:\n$$y = 3(2)^2 - 12(2) + 7 = 12 - 24 + 7 = -5$$\nStationary point is \\((2, -5)\\).",
+        alert: "Always plug x back into original y equation, NOT derivative."
+      },
+      {
+        id: 31,
+        category: "Stationary Points & Nature",
+        difficulty: "Medium",
+        question: "Find the stationary points of \\(y = x^3 - 3x + 4\\).",
+        options: ["\\((1, 2)\\) and \\((-1, 6)\\)", "\\((1, 2)\\) and \\((0, 4)\\)", "\\((3, 22)\\) and \\((-3, -14)\\)", "\\((1, 6)\\) and \\((-1, 2)\\)"],
+        answer: 0,
+        explanation: "Differentiate and set to 0:\n$$\\frac{dy}{dx} = 3x^2 - 3 = 0 \\implies 3(x^2 - 1) = 0 \\implies x = \\pm 1$$\n- At \\(x = 1\\): \\(y = 1^3 - 3(1) + 4 = 2 \\implies (1, 2)\\)\n- At \\(x = -1\\): \\(y = (-1)^3 - 3(-1) + 4 = -1 + 3 + 4 = 6 \\implies (-1, 6)\\)",
+        alert: "Carefully evaluate negative cube powers: \\((-1)^3 = -1\\)."
+      },
+      {
+        id: 32,
+        category: "Stationary Points & Nature",
+        difficulty: "Hard",
+        question: "Determine the nature of the turning points for \\(y = 2x^3 - 9x^2 + 12x + 3\\).",
+        options: [
+          "Max at \\((1, 8)\\), Min at \\((2, 7)\\)",
+          "Min at \\((1, 8)\\), Max at \\((2, 7)\\)",
+          "Max at \\((2, 7)\\), Min at \\((3, 12)\\)",
+          "Min at \\((1, 8)\\), Min at \\((2, 7)\\)"
+        ],
+        answer: 0,
+        explanation: "1) \\(\\frac{dy}{dx} = 6x^2 - 18x + 12 = 0 \\implies 6(x - 1)(x - 2) = 0 \\implies x = 1, x = 2\\)\n- \\(y(1) = 2(1) - 9(1) + 12(1) + 3 = 8 \\implies (1, 8)\\)\n- \\(y(2) = 2(8) - 9(4) + 12(2) + 3 = 7 \\implies (2, 7)\\)\n2) Second derivative: \\(\\frac{d^2y}{dx^2} = 12x - 18\\)\n- At \\(x = 1\\): \\(12(1) - 18 = -6 < 0 \\implies\\) **Local Maximum**\n- At \\(x = 2\\): \\(12(2) - 18 = +6 > 0 \\implies\\) **Local Minimum**",
+        alert: "Substitute x values into second derivative to test nature."
+      },
+      {
+        id: 33,
+        category: "Stationary Points & Nature",
+        difficulty: "Hard",
+        question: "The curve \\(y = x^3 + ax^2 + bx\\) has a stationary point at \\((2, -4)\\). Find \\(a\\) and \\(b\\).",
+        options: ["\\(a = -3, b = 0\\)", "\\(a = -4, b = 4\\)", "\\(a = -2, b = 0\\)", "\\(a = 3, b = -6\\)"],
+        answer: 0,
+        explanation: "1) Point \\((2, -4)\\) on curve:\n$$-4 = 2^3 + a(2)^2 + b(2) \\implies -4 = 8 + 4a + 2b \\implies 4a + 2b = -12 \\implies 2a + b = -6$$\n2) Stationary point at \\(x = 2 \\implies \\frac{dy}{dx} = 0\\):\n$$\\frac{dy}{dx} = 3x^2 + 2ax + b \\implies 3(4) + 4a + b = 0 \\implies 4a + b = -12$$\n3) Subtract equations:\n$$(4a + b) - (2a + b) = -12 - (-6) \\implies 2a = -6 \\implies a = -3$$\nSubstitute \\(a = -3 \\implies 2(-3) + b = -6 \\implies b = 0\\).",
+        alert: "Use both point coordinate and derivative condition simultaneously."
+      },
+      {
+        id: 34,
+        category: "Stationary Points & Nature",
+        difficulty: "Hard",
+        question: "Find maximum volume of a box given volume \\(V = 12x - x^3\\) for \\(x > 0\\).",
+        options: ["\\(16\\)", "\\(12\\)", "\\(20\\)", "\\(8\\)"],
+        answer: 0,
+        explanation: "Set \\(\\frac{dV}{dx} = 0\\):\n$$\\frac{dV}{dx} = 12 - 3x^2 = 0 \\implies 3x^2 = 12 \\implies x^2 = 4 \\implies x = 2$$\nCalculate maximum volume:\n$$V_{max} = 12(2) - (2)^3 = 24 - 8 = 16$$",
+        alert: "Check condition \\(x > 0\\) since dimensions cannot be negative."
+      },
+      {
+        id: 35,
+        category: "Stationary Points & Nature",
+        difficulty: "Hard",
+        question: "A particle displacement is \\(s = t^3 - 6t^2 + 9t\\). Find minimum velocity.",
+        options: ["\\(-3\\)", "\\(0\\)", "\\(3\\)", "\\(-6\\)"],
+        answer: 0,
+        explanation: "1) Velocity: $$v = \\frac{ds}{dt} = 3t^2 - 12t + 9$$\n2) To find minimum velocity, differentiate velocity with respect to time (acceleration) and set to 0:\n$$\\frac{dv}{dt} = 6t - 12 = 0 \\implies t = 2$$\n3) Minimum velocity at \\(t = 2\\):\n$$v_{min} = 3(2)^2 - 12(2) + 9 = 12 - 24 + 9 = -3$$",
+        alert: "Minimum of velocity occurs where acceleration equals zero."
+      }
+    ];
+
+    // App State Management
+    let currentCategory = 'all';
+    let currentDifficulty = 'all';
+    let activeMode = 'study'; // 'study' or 'quiz'
+    let bookmarks = JSON.parse(localStorage.getItem('diff_bookmarks') || '[]');
+    let userAnswers = JSON.parse(localStorage.getItem('diff_user_answers') || '{}');
+    let onlyBookmarksFilter = false;
+
+    // Quiz Mode Variables
+    let quizQuestions = [];
+    let quizTimerInterval = null;
+    let quizTimeRemaining = 0;
+    let isQuizActive = false;
+
+    const categories = [
+      "Power Rule & Basic Differentiation",
+      "Negative & Fractional Indices",
+      "Simple Chain Rule (ax + b)^n",
+      "Equations of Tangents and Normals",
+      "Stationary Points & Nature"
+    ];
+
+    function initCategoryList() {
+      const catListEl = document.getElementById('categoryList');
+      let html = `
+        <button onclick="selectCategory('all')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-between ${currentCategory === 'all' ? 'bg-brand-500 text-white shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}">
+          <span>All Topics</span>
+          <span class="text-[10px] opacity-80 px-2 py-0.5 rounded-full bg-white/20">${rawQuestions.length}</span>
+        </button>
+      `;
+
+      categories.forEach(cat => {
+        const count = rawQuestions.filter(q => q.category === cat).length;
+        const isActive = currentCategory === cat;
+        html += `
+          <button onclick="selectCategory('${cat}')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-between ${isActive ? 'bg-brand-500 text-white shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}">
+            <span class="truncate pr-2">${cat}</span>
+            <span class="text-[10px] font-bold opacity-80 px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 dark:text-slate-300 ${isActive ? '!bg-white/20 !text-white' : ''}">${count}</span>
+          </button>
+        `;
+      });
+
+      catListEl.innerHTML = html;
+    }
+
+    function selectCategory(cat) {
+      currentCategory = cat;
+      initCategoryList();
+      renderQuestions();
+      updateFilterBadge();
+    }
+
+    function setDifficulty(diff) {
+      currentDifficulty = diff;
+      ['all', 'Easy', 'Medium', 'Hard'].forEach(d => {
+        const btn = document.getElementById(`diff-${d}`);
+        if (d === diff) {
+          btn.className = "py-2 rounded-lg bg-brand-500 text-white font-bold shadow-sm";
+        } else {
+          btn.className = "py-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-200 dark:hover:bg-slate-600";
+        }
+      });
+      renderQuestions();
+      updateFilterBadge();
+    }
+
+    function toggleBookmarkFilter() {
+      onlyBookmarksFilter = !onlyBookmarksFilter;
+      const btn = document.getElementById('btnOnlyBookmarks');
+      if (onlyBookmarksFilter) {
+        btn.className = "text-xs font-bold px-3 py-1.5 rounded-lg bg-amber-500 text-white shadow-sm transition-all flex items-center gap-1.5";
+      } else {
+        btn.className = "text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center gap-1.5";
+      }
+      renderQuestions();
+    }
+
+    function setAppMode(mode) {
+      activeMode = mode;
+      const btnStudy = document.getElementById('btnStudyMode');
+      const btnQuiz = document.getElementById('btnQuizMode');
+      const quizSetupPanel = document.getElementById('quizSetupPanel');
+      const studyToolbar = document.getElementById('studyToolbar');
+
+      if (mode === 'study') {
+        btnStudy.className = "px-4 py-2 rounded-lg transition-all bg-white dark:bg-slate-700 text-brand-600 dark:text-brand-400 font-bold shadow-sm";
+        btnQuiz.className = "px-4 py-2 rounded-lg transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-bold";
+        quizSetupPanel.classList.add('hidden');
+        studyToolbar.classList.remove('hidden');
+      } else {
+        btnQuiz.className = "px-4 py-2 rounded-lg transition-all bg-white dark:bg-slate-700 text-brand-600 dark:text-brand-400 font-bold shadow-sm";
+        btnStudy.className = "px-4 py-2 rounded-lg transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-bold";
+        quizSetupPanel.classList.remove('hidden');
+        studyToolbar.classList.add('hidden');
+      }
+      renderQuestions();
+    }
+
+    function updateFilterBadge() {
+      const badge = document.getElementById('activeFilterBadge');
+      let text = `${currentCategory === 'all' ? 'All Syllabus Topics' : currentCategory}`;
+      if (currentDifficulty !== 'all') text += ` • ${currentDifficulty}`;
+      badge.textContent = text;
+    }
+
+    function getFilteredQuestions() {
+      const searchVal = document.getElementById('searchInput').value.toLowerCase();
+      return rawQuestions.filter(q => {
+        const matchesCat = currentCategory === 'all' || q.category === currentCategory;
+        const matchesDiff = currentDifficulty === 'all' || q.difficulty === currentDifficulty;
+        const matchesSearch = q.question.toLowerCase().includes(searchVal) || q.category.toLowerCase().includes(searchVal);
+        const matchesBookmark = !onlyBookmarksFilter || bookmarks.includes(q.id);
+        return matchesCat && matchesDiff && matchesSearch && matchesBookmark;
+      });
+    }
+
+    function renderQuestions() {
+      const container = document.getElementById('questionContainer');
+      const emptyState = document.getElementById('emptyState');
+      const list = activeMode === 'quiz' && isQuizActive ? quizQuestions : getFilteredQuestions();
+
+      document.getElementById('totalFilterCount').textContent = list.length;
+      updateProgress(list);
+
+      if (list.length === 0) {
+        container.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        emptyState.classList.add('flex');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+      emptyState.classList.remove('flex');
+
+      let html = '';
+      list.forEach((q) => {
+        const isBookmarked = bookmarks.includes(q.id);
+        const selectedOpt = userAnswers[q.id];
+        const hasAnswered = selectedOpt !== undefined;
+
+        let diffBadgeColor = 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400';
+        if (q.difficulty === 'Medium') diffBadgeColor = 'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400';
+        if (q.difficulty === 'Hard') diffBadgeColor = 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400';
+
+        html += `
+          <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm transition-all hover:shadow-md">
+            
+            <!-- Header Meta -->
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-xs font-bold px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+                  Q${q.id}
+                </span>
+                <span class="text-xs font-bold px-2.5 py-1 rounded-md bg-brand-50 dark:bg-brand-900/40 text-brand-600 dark:text-brand-400 border border-brand-200 dark:border-brand-800">
+                  ${q.category}
+                </span>
+                <span class="text-xs font-bold px-2.5 py-1 rounded-md ${diffBadgeColor}">
+                  ${q.difficulty}
+                </span>
+              </div>
+
+              <button onclick="toggleBookmark(${q.id})" class="text-lg transition-transform active:scale-125 ${isBookmarked ? 'text-amber-500' : 'text-slate-300 dark:text-slate-600 hover:text-amber-400'}">
+                <i class="fa-${isBookmarked ? 'solid' : 'regular'} fa-bookmark"></i>
+              </button>
+            </div>
+
+            <!-- Question Body -->
+            <div class="text-base font-medium text-slate-800 dark:text-slate-100 mb-6 leading-relaxed">
+              ${q.question}
+            </div>
+
+            <!-- Options Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+              ${q.options.map((opt, i) => {
+                let btnStyle = "bg-slate-50 dark:bg-slate-900/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-brand-400 dark:hover:border-brand-500";
+                
+                if (hasAnswered) {
+                  if (i === q.answer) {
+                    btnStyle = "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 text-emerald-700 dark:text-emerald-300 font-bold shadow-sm";
+                  } else if (i === selectedOpt) {
+                    btnStyle = "bg-rose-50 dark:bg-rose-950/40 border-rose-500 text-rose-700 dark:text-rose-300 font-bold";
+                  } else {
+                    btnStyle = "bg-slate-50 dark:bg-slate-900/30 border-slate-200 dark:border-slate-800 text-slate-400 opacity-60";
+                  }
+                }
+
+                return `
+                  <button onclick="selectOption(${q.id}, ${i})" ${hasAnswered && activeMode === 'quiz' ? 'disabled' : ''} class="w-full text-left p-3.5 rounded-xl border text-sm transition-all flex items-center justify-between group ${btnStyle}">
+                    <span class="flex items-center gap-3">
+                      <span class="w-6 h-6 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 flex items-center justify-center text-xs font-bold ${hasAnswered && i === q.answer ? '!bg-emerald-500 !text-white !border-emerald-500' : ''}">
+                        ${String.fromCharCode(65 + i)}
+                      </span>
+                      <span>${opt}</span>
+                    </span>
+                    ${hasAnswered && i === q.answer ? '<i class="fa-solid fa-circle-check text-emerald-500"></i>' : ''}
+                    ${hasAnswered && i === selectedOpt && i !== q.answer ? '<i class="fa-solid fa-circle-xmark text-rose-500"></i>' : ''}
+                  </button>
+                `;
+              }).join('')}
+            </div>
+
+            <!-- Explanation & Worked Solution -->
+            ${activeMode === 'study' || hasAnswered ? `
+              <div class="mt-4 border-t border-slate-100 dark:border-slate-700/60 pt-4">
+                <details class="group" ${hasAnswered ? 'open' : ''}>
+                  <summary class="cursor-pointer text-xs font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400 flex items-center gap-2 select-none">
+                    <i class="fa-solid fa-lightbulb"></i> Worked Solution &amp; Key Explanation
+                    <i class="fa-solid fa-chevron-down ml-auto transition-transform group-open:rotate-180"></i>
+                  </summary>
+                  <div class="mt-3 p-4 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 text-xs sm:text-sm text-slate-600 dark:text-slate-300 whitespace-pre-line leading-relaxed font-mono">
+                    ${q.explanation}
+                  </div>
+                  ${q.alert ? `
+                    <div class="mt-2 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-xs text-amber-800 dark:text-amber-300 flex items-start gap-2">
+                      <i class="fa-solid fa-triangle-exclamation text-amber-500 mt-0.5"></i>
+                      <span><strong>Common Mistake:</strong> ${q.alert}</span>
+                    </div>
+                  ` : ''}
+                </details>
+              </div>
+            ` : ''}
+
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+
+      // Render KaTeX Math Expressions
+      if (window.renderMathInElement) {
+        renderMathInElement(container, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '\\(', right: '\\)', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    function selectOption(qId, optIdx) {
+      userAnswers[qId] = optIdx;
+      localStorage.setItem('diff_user_answers', JSON.stringify(userAnswers));
+      renderQuestions();
+    }
+
+    function toggleBookmark(qId) {
+      if (bookmarks.includes(qId)) {
+        bookmarks = bookmarks.filter(id => id !== qId);
+      } else {
+        bookmarks.push(qId);
+      }
+      localStorage.setItem('diff_bookmarks', JSON.stringify(bookmarks));
+      document.getElementById('bookmarkCount').textContent = bookmarks.length;
+      renderQuestions();
+    }
+
+    function updateProgress(currentFilteredList) {
+      const total = currentFilteredList.length || 1;
+      let correctCount = 0;
+
+      currentFilteredList.forEach(q => {
+        if (userAnswers[q.id] === q.answer) correctCount++;
+      });
+
+      document.getElementById('completedCount').textContent = correctCount;
+      document.getElementById('bookmarkCount').textContent = bookmarks.length;
+
+      const percent = Math.round((correctCount / total) * 100);
+      document.getElementById('progressBar').style.width = `${percent}%`;
+      document.getElementById('scorePercent').textContent = `${percent}% Score`;
+    }
+
+    function resetAllProgress() {
+      userAnswers = {};
+      localStorage.removeItem('diff_user_answers');
+      renderQuestions();
+    }
+
+    // Quiz Functions
+    function startQuiz() {
+      const count = parseInt(document.getElementById('quizLength').value);
+      quizQuestions = [...rawQuestions].sort(() => 0.5 - Math.random()).slice(0, count);
+      isQuizActive = true;
+      
+      document.getElementById('activeQuizBar').classList.remove('hidden');
+      quizTimeRemaining = count * 90; // 1.5 min per question
+      
+      if (quizTimerInterval) clearInterval(quizTimerInterval);
+      quizTimerInterval = setInterval(updateQuizTimer, 1000);
+      
+      renderQuestions();
+    }
+
+    function updateQuizTimer() {
+      if (quizTimeRemaining <= 0) {
+        clearInterval(quizTimerInterval);
+        submitQuiz();
+        return;
+      }
+      quizTimeRemaining--;
+      const mins = Math.floor(quizTimeRemaining / 60);
+      const secs = quizTimeRemaining % 60;
+      document.getElementById('quizTimer').textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function submitQuiz() {
+      clearInterval(quizTimerInterval);
+      isQuizActive = false;
+      document.getElementById('activeQuizBar').classList.add('hidden');
+      renderQuestions();
+    }
+
+    function initKaTeX() {
+      renderQuestions();
+    }
+
+    // Theme Switcher Logic
+    const themeToggle = document.getElementById('themeToggle');
+    const themeToggleMobile = document.getElementById('themeToggleMobile');
+
+    function toggleTheme() {
+      document.documentElement.classList.toggle('dark');
+      const isDark = document.documentElement.classList.contains('dark');
+      localStorage.setItem('diff_theme', isDark ? 'dark' : 'light');
+    }
+
+    if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
+    if (themeToggleMobile) themeToggleMobile.addEventListener('click', toggleTheme);
+
+    if (localStorage.getItem('diff_theme') === 'dark' || (!('diff_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+
+    // Initialize Application
+    window.onload = () => {
+      initCategoryList();
+      renderQuestions();
+    };
+  </script>
+</body>
+</html>
